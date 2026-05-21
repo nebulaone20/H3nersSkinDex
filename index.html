@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>H3ners Skindex</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0b0f1a;
+    color: white;
+    font-family: Inter, sans-serif;
+    min-height: 100vh;
+}
+
+header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(90deg, #111827, #0f172a);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+h1 {
+    font-family: Orbitron, sans-serif;
+    font-size: 2rem;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    opacity: 0.7;
+    margin-top: 6px;
+}
+
+.top-bar {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+input, button, select {
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+}
+
+input, select {
+    background: #1e293b;
+    color: white;
+}
+
+button {
+    background: #ff4655;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+#stats {
+    margin-top: 14px;
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    opacity: 0.9;
+}
+
+.stat-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 12px 16px;
+    border-radius: 12px;
+}
+
+main {
+    padding: 24px;
+}
+
+.weapon-section {
+    margin-bottom: 48px;
+}
+
+.weapon-title {
+    font-family: Orbitron, sans-serif;
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+    color: #ff4655;
+}
+
+.skin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+}
+
+.skin-card {
+    background: linear-gradient(180deg, #111827, #0f172a);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    overflow: hidden;
+    transition: 0.2s;
+}
+
+.skin-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.18);
+}
+
+.skin-image {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    background: #111;
+}
+
+.skin-content {
+    padding: 14px;
+}
+
+.skin-name {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.skin-collection {
+    opacity: 0.65;
+    margin-top: 4px;
+    font-size: 0.9rem;
+}
+
+.owned {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.owner-tag {
+    margin-top: 10px;
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.owner-yes {
+    background: rgba(34,197,94,0.18);
+    color: #4ade80;
+}
+
+.owner-no {
+    background: rgba(239,68,68,0.18);
+    color: #f87171;
+}
+
+footer {
+    padding: 24px;
+    opacity: 0.6;
+    text-align: center;
+}
+
+.admin-box {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.viewer-badge {
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+@media (max-width: 700px) {
+    .top-bar {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>H3ners Skindex</h1>
+    <div class="subtitle">See H3ners Shop Skins For the 100 Day Challenge.</div>
+
+    <div class="top-bar">
+        <div class="admin-box">
+            <input type="password" id="adminPassword" placeholder="Admin password" />
+            <button id="loginBtn">Owner Login</button>
+        </div>
+
+        <input type="text" id="search" placeholder="Search skins..." />
+
+        <select id="filterOwned">
+            <option value="all">All Skins</option>
+            <option value="owned">Owned Only</option>
+            <option value="missing">Missing Only</option>
+        </select>
+    </div>
+
+    <div id="stats">
+        <div class="stat-card">Owned: <span id="ownedCount">0</span></div>
+        <div class="stat-card">Total: <span id="totalCount">0</span></div>
+        <div class="stat-card">Completion: <span id="completion">0%</span></div>
+        <div class="viewer-badge" id="modeLabel">Viewer Mode</div>
+    </div>
+</header>
+
+<main id="app"></main>
+
+<footer>
+Realtime VALORANT skin collection tracker.
+</footer>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {
+    getDatabase,
+    ref,
+    onValue,
+    set,
+    update
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+/* ==========================================
+   FIREBASE SETUP
+========================================== */
+
+const firebaseConfig = {
+    authDomain: 'skindex-d7440.firebaseapp.com',
+    databaseURL: 'https://skindex-d7440-default-rtdb.firebaseio.com/',
+    projectId: 'skindex-d7440',
+    storageBucket: 'skindex-d7440.appspot.com',
+    messagingSenderId: '964711838862',
+    appId: 'APP_ID'
+};
+
+const OWNER_PASSWORD = 'test';
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* ==========================================
+   SAMPLE SKINS
+   Add more whenever you want.
+========================================== */
+
+const skins = {
+    Vandal: [
+        {
+            id: 'prime_vandal',
+            name: 'Prime Vandal',
+            collection: 'Prime Collection',
+            image: 'https://static.wikia.nocookie.net/valorant/images/a/aa/Prime_Vandal.png/revision/latest'
+        },
+        {
+            id: 'reaver_vandal',
+            name: 'Reaver Vandal',
+            collection: 'Reaver Collection',
+            image: 'https://static.wikia.nocookie.net/valorant/images/2/27/Reaver_Vandal.png/revision/latest?cb=20230711203347'
+        },
+        {
+            id: 'kuronami_vandal',
+            name: 'Kuronami Vandal',
+            collection: 'Kuronami Collection',
+            image: 'https://static.wikia.nocookie.net/valorant/images/2/2e/Kuronami_Vandal.png/revision/latest?cb=20240109154323'
+        }
+    ],
+
+    Phantom: [
+        {
+            id: 'oni_phantom',
+            name: 'Oni Phantom',
+            collection: 'Oni Collection',
+            image: 'https://static.wikia.nocookie.net/valorant/images/6/65/Oni_Phantom.png/revision/latest?cb=20230711201948'
+        },
+        {
+            id: 'champions24_phantom',
+            name: 'Champions 2024 Phantom',
+            collection: 'Champions',
+            image: 'https://static.wikia.nocookie.net/valorant/images/8/8c/Champions_2024_Phantom.png/revision/latest?cb=20240730145457'
+        }
+    ],
+
+    Operator: [
+        {
+            id: 'reaver_operator',
+            name: 'Reaver Operator',
+            collection: 'Reaver Collection',
+            image: 'https://static.wikia.nocookie.net/valorant/images/e/e7/Reaver_Operator.png/revision/latest?cb=20230711203258'
+        },
+        {
+            id: 'ion_operator',
+            name: 'Ion Operator',
+            collection: 'Ion Collection',
+            image: 'https://static.wikia.nocookie.net/valorant/images/b/b8/Ion_Operator.png/revision/latest?cb=20230711195909'
+        }
+    ]
+};
+
+const appElement = document.getElementById('app');
+const ownedCountEl = document.getElementById('ownedCount');
+const totalCountEl = document.getElementById('totalCount');
+const completionEl = document.getElementById('completion');
+const searchInput = document.getElementById('search');
+const filterOwned = document.getElementById('filterOwned');
+const modeLabel = document.getElementById('modeLabel');
+
+let ownedSkins = {};
+let adminMode = false;
+
+/* ==========================================
+   OWNER LOGIN
+========================================== */
+
+document.getElementById('loginBtn').onclick = () => {
+    const pass = document.getElementById('adminPassword').value;
+
+    if (pass === OWNER_PASSWORD) {
+        adminMode = true;
+        modeLabel.textContent = 'Owner Mode';
+        modeLabel.style.color = '#4ade80';
+        render();
+    } else {
+        alert('Wrong password');
+    }
+};
+
+/* ==========================================
+   REALTIME DATABASE LISTENER
+========================================== */
+
+onValue(ref(db, 'ownedSkins'), snapshot => {
+    ownedSkins = snapshot.val() || {};
+    render();
+});
+
+/* ==========================================
+   Skin Appearance
+========================================== */
+
+async function addSkinAppearance(id) {
+    if (!adminMode) return;
+
+    const currentAmount = ownedSkins[id] || 0;
+
+    await update(ref(db, 'ownedSkins'), {
+        [id]: currentAmount + 1
+    });
+}
+
+/* ==========================================
+   RENDER
+========================================== */
+
+function render() {
+    appElement.innerHTML = '';
+
+    const query = searchInput.value.toLowerCase();
+    const filter = filterOwned.value;
+
+    let total = 0;
+    let owned = 0;
+
+    Object.entries(skins).forEach(([weapon, weaponSkins]) => {
+
+        const section = document.createElement('section');
+        section.className = 'weapon-section';
+
+        const title = document.createElement('div');
+        title.className = 'weapon-title';
+        title.textContent = weapon;
+
+        const grid = document.createElement('div');
+        grid.className = 'skin-grid';
+
+        let visibleCards = 0;
+
+        weaponSkins.forEach(skin => {
+            total++;
+
+            const appearances = ownedSkins[skin.id] || 0;
+
+            if (appearances > 0) owned++;
+
+            const matchesSearch =
+                skin.name.toLowerCase().includes(query) ||
+                skin.collection.toLowerCase().includes(query);
+
+            const matchesFilter =
+                filter === 'all' ||
+                (filter === 'owned' && isOwned) ||
+                (filter === 'missing' && !isOwned);
+
+            if (!matchesSearch || !matchesFilter) return;
+
+            visibleCards++;
+
+            const card = document.createElement('div');
+            card.className = 'skin-card';
+
+            card.innerHTML = `
+                <img class="skin-image" src="${skin.image}" alt="${skin.name}">
+
+                <div class="skin-content">
+                    <div class="skin-name">${skin.name}</div>
+                    <div class="skin-collection">${skin.collection}</div>
+
+                    <div class="owner-tag ${appearances > 0 ? 'owner-yes' : 'owner-no'}">
+                        Seen ${appearances} time${appearances === 1 ? '' : 's'}
+                    </div>
+                </div>
+            `;
+
+            if (adminMode) {
+                const controls = document.createElement('div');
+                controls.className = 'owned';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = isOwned;
+
+                checkbox.onchange = () => {
+                    toggleSkin(skin.id, checkbox.checked);
+                };
+
+                const label = document.createElement('span');
+                label.textContent = 'I own this skin';
+
+                controls.appendChild(checkbox);
+                controls.appendChild(label);
+
+                card.querySelector('.skin-content').appendChild(controls);
+            }
+
+            grid.appendChild(card);
+        });
+
+        if (visibleCards > 0) {
+            section.appendChild(title);
+            section.appendChild(grid);
+            appElement.appendChild(section);
+        }
+    });
+
+    ownedCountEl.textContent = owned;
+    totalCountEl.textContent = total;
+
+    const percent = total > 0
+        ? Math.round((owned / total) * 100)
+        : 0;
+
+    completionEl.textContent = percent + '%';
+}
+
+searchInput.addEventListener('input', render);
+filterOwned.addEventListener('change', render);
+
+render();
+
+</script>
+</body>
+</html>
