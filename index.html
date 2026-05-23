@@ -123,6 +123,58 @@ main {
     backdrop-filter: blur(10px);
 }
 
+.skin-card-owned {
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(
+            135deg,
+            #3b0d12 0%,
+            #7f1d1d 35%,
+            #ff4655 100%
+        ) !important;
+
+    border: 1px solid rgba(255,70,85,0.7);
+    box-shadow:
+        0 0 18px rgba(255,70,85,0.35),
+        inset 0 0 20px rgba(255,255,255,0.04);
+}
+
+.skin-card-owned::before {
+    content: '';
+
+    position: absolute;
+    top: -120%;
+    left: -40%;
+
+    width: 60%;
+    height: 300%;
+
+    background:
+        linear-gradient(
+            to right,
+            rgba(255,255,255,0),
+            rgba(255,255,255,0.22),
+            rgba(255,255,255,0)
+        );
+
+    transform: rotate(25deg);
+
+    animation: ownedShine 4s linear infinite;
+
+    pointer-events: none;
+}
+
+@keyframes ownedShine {
+    0% {
+        transform: translateX(-250%) rotate(25deg);
+    }
+
+    100% {
+        transform: translateX(500%) rotate(25deg);
+    }
+}
+
 .skin-card:hover {
     transform: translateY(-3px);
     border-color: rgba(255,255,255,0.18);
@@ -218,28 +270,9 @@ footer {
 
         <input type="text" id="search" placeholder="Search skins..." />
 
+        <!-- Options populated dynamically by JS after API loads -->
         <select id="filterOwned">
             <option value="all">All Guns</option>
-            <option value="Classic">Classic</option>
-            <option value="Shorty">Shorty</option>
-            <option value="Frenzy">Frenzy</option>
-            <option value="Ghost">Ghost</option>
-            <option value="Bandit">Bandit</option>
-            <option value="Sheriff">Sheriff</option>
-            <option value="Stinger">Stinger</option>
-            <option value="Spectre">Spectre</option>
-            <option value="Bucky">Bucky</option>
-            <option value="Judge">Judge</option>
-            <option value="Bulldog">Bulldog</option>
-            <option value="Guardian">Guardian</option>
-            <option value="Phantom">Phantom</option>
-            <option value="Vandal">Vandal</option>
-            <option value="Melee">Melee</option>
-            <option value="Marshal">Marshal</option>
-            <option value="Outlaw">Outlaw</option>
-            <option value="Operator">Operator</option>
-            <option value="Ares">Ares</option>
-            <option value="Odin">Odin</option>
         </select>
     </div>
 
@@ -254,8 +287,9 @@ footer {
 <main id="app"></main>
 
 <footer>
-Realtime VALORANT Shop Skin Tracker.
+    Realtime VALORANT Shop Skin Tracker.
 </footer>
+
 <script type="module" src="skindex.js"></script>
 </body>
 </html>
